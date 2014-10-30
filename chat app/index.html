@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Chat App</title>
+	<style type='text/css'>
+		html {height: 100%;width: 100%;}
+		body {
+			padding: 0;
+			margin: 0;
+			height: 100%;
+			background-image: url('body-pattern.png');
+		}
+		.container {
+			height: 90%;
+			min-height: 400px;
+			width: 80%;
+			min-width: 600px;
+			margin: 5vh auto;
+		}
+		.canvas {
+			height: 100%;
+			width: 100%;
+			border: 2px solid #ababab;
+			border-radius: 3%;
+			margin-left: -2px;
+			overflow: hidden;
+		}
+		.sideBar {
+			float: left;
+			width: 25%;
+			height: 100%;
+			background-color: white;
+			border-right: 2px solid #ababab;
+			border-collapse:collapse;
+		}
+		.mainScreen {
+			float: right;
+			width: 74%;
+			height: 100%;
+		}
+		.chatLog {
+			width: 90%;
+			margin: auto;
+		}
+		#messageInput {
+			width: 80%;
+			height: 40px;
+			font-size: 2em;
+			padding: 0;
+		}
+		#submitButton {
+			height: 4em;
+			width: 6em;
+			border: 1px;
+			border-radius: 2px;
+			float: right;
+		}
+		.chatInputContainer {
+			position: absolute;
+			width: 50%;
+			bottom: 7%;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="canvas">
+			<div class="sideBar"></div>
+			<div class="mainScreen">
+				<div class="chatLog">
+					<h1 id="status">not connected</h1>
+					<ul id="chatCanvas"></ul>
+				</div>
+				<div class="chatInputContainer">
+					<form>
+						<input id="messageInput" type="text" placeholder="Type msg"/>
+						<input id="submitButton" type="button" value="SEND"/>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="js/socket.io.js"></script>
+	<script type="text/javascript">
+		var server = io.connect("http://localhost:8080");
+		var submitButton = $('#submitButton');
+		var messageInput = $('#messageInput');
+		var chatCanvas = $('#chatCanvas');
+		server.on('login', function(connectionStatus){
+			$('#status').html(connectionStatus);
+		});
+		server.on('message', function(msg){
+			chatCanvas.append('<li>'+msg+'</li>');
+		});
+		submitButton.on('click', function(e){
+			chatCanvas.append('<li>'+messageInput.val()+'</li>');
+			server.emit('message', messageInput.val());
+			messageInput.val('');
+		});
+	</script>
+</body>
+</html>
